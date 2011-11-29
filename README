@@ -1,0 +1,10 @@
+django-bootup
+================
+
+A Django  application that helps with Django User's email management".
+``You can associate multiple email addresses to a single Django User.``
+
+Current Features:
+_________________
+
+1. Associate ``multiple`` email addresses to a Django User
