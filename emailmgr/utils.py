@@ -18,7 +18,7 @@ def get_unique_random(length=10):
     rand = ''.join([random.choice(randtime+string.letters+string.digits) for i in range(length)])
     return sha_constructor(rand).hexdigest()[:length]
  
-# give a template name, get a full path to it
+# given a template name, return its path
 def get_template(name):
     return os.path.join(getattr(localsettings, "EMAIL_MGR_TEMPLATE_PATH"), name)
 

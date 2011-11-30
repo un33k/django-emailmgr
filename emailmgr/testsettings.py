@@ -16,6 +16,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'emailmgr',
 ]
+ROOT_URLCONF = 'emailmgr.urls'
 
 
 
