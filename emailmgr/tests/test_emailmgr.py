@@ -15,11 +15,11 @@ from django.contrib.auth import authenticate
 class EmailTestCase(TestCase):
     """Tests for Django Mgr-Email - Default Superuser """
     def setUp(self):
-        #create a base test user
-        self.user = User.objects.create_user('val', 'val@example.com', '1secret')
-
         self.client = Client()
 
+        #create a base test user
+        self.user = User.objects.create_user('val', 'val@example.com', '1pass')
+        
     def test_email_address_uniqueness(self):
         """
         Test & validates email addresses uniqueness
@@ -52,20 +52,24 @@ class EmailTestCase(TestCase):
 
 
     def test_email_add(self):
-        # user is not authenticated yet, verify
-        self.failUnless(self.user.is_authenticated())
-        
-        # authenticate the user
-        user = authenticate(username='val', password='1secret')
-        self.failUnless(user)
-    
-        # user is not authenticated yet, verify
-        self.failUnless(self.user.is_authenticated())
-        
-        response = self.client.get(reverse('emailmgr_email_add'))
+        # import pdb; pdb.set_trace()
+        retval = self.client.login(username='val', password='1pass')
+        self.failUnless(retval)
 
-        # response = self.client.post('/login/', {'username': 'mike', 'password': '2secret'})
+        response = self.client.get(reverse('emailmgr_email_add'))
         print response
+
+        # # # authenticate the user
+        # # user = authenticate(username='val', password='1secret')
+        # # self.failUnless(user)
+        # #     
+        # # # user is not authenticated yet, verify
+        # # self.failUnless(self.user.is_authenticated())
+        # # 
+        # response = self.client.get(reverse('emailmgr_email_add'))
+        # # 
+        # #response = self.client.post('/login/', {'username': 'mike', 'password': '2secret'})
+        # print response
 
 
 

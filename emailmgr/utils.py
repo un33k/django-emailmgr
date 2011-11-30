@@ -7,7 +7,7 @@ from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.utils.hashcompat import sha_constructor
 from django.utils.translation import gettext_lazy as _
-import localsettings
+import defaults
 
 def send_activation(identitifer):
     current_site = Site.objects.get_current()
@@ -20,7 +20,7 @@ def get_unique_random(length=10):
  
 # given a template name, return its path
 def get_template(name):
-    return os.path.join(getattr(localsettings, "EMAIL_MGR_TEMPLATE_PATH"), name)
+    return os.path.join(getattr(defaults, "EMAIL_MGR_TEMPLATE_PATH"), name)
 
 
 

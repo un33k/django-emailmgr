@@ -3,8 +3,10 @@ from django.template import RequestContext
 from django.contrib import messages as Msg
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
 from forms import EmailAddressForm
-from utils import send_activation
+from utils import send_activation, get_template
 
 @login_required
 def email_add(request):
