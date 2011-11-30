@@ -7,13 +7,16 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from emailmgr.models import EmailAddress
 from django.test.client import Client
+from django.core.urlresolvers import reverse
 from emailmgr import forms
+from django.contrib.auth import authenticate
+
 
 class EmailTestCase(TestCase):
     """Tests for Django Mgr-Email - Default Superuser """
     def setUp(self):
         #create a base test user
-        User.objects.create_user('val', 'val@example.com', '1secret')
+        self.user = User.objects.create_user('val', 'val@example.com', '1secret')
 
         self.client = Client()
 
@@ -46,5 +49,28 @@ class EmailTestCase(TestCase):
         # test a unique email address
         form = forms.EmailAddressForm(user=user, data={'email': 'sam@example.com'})
         self.failUnless(form.is_valid())
+
+
+    def test_email_add(self):
+        # user is not authenticated yet, verify
+        self.failUnless(self.user.is_authenticated())
+        
+        # authenticate the user
+        user = authenticate(username='val', password='1secret')
+        self.failUnless(user)
+    
+        # user is not authenticated yet, verify
+        self.failUnless(self.user.is_authenticated())
+        
+        response = self.client.get(reverse('emailmgr_email_add'))
+
+        # response = self.client.post('/login/', {'username': 'mike', 'password': '2secret'})
+        print response
+
+
+
+
+
+
 
 
