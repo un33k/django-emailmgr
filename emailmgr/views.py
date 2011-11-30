@@ -2,8 +2,8 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib import messages as Msg
 from django.http import HttpResponseRedirect
-from .forms import EmailAddressForm
-from .utils import send_activation
+from forms import EmailAddressForm
+from utils import send_activation
 
 @login_required
 def email_add(request):

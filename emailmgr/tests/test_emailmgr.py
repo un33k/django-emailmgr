@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.template import Context, Template
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from mgrEmail.models import EmailAddress
+from emailmgr.models import EmailAddress
 
 class EmailTestCase(TestCase):
     """Tests for Django Mgr-Email - Default Superuser """

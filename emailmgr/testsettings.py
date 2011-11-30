@@ -2,6 +2,7 @@ import os
 
 DEBUG = TEMPLATE_DEBUG = True
 MAIN_DOMAIN_NAME = "example.com"
+SITE_ID = 1
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

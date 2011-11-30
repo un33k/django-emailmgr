@@ -7,7 +7,7 @@ from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.utils.hashcompat import sha_constructor
 from django.utils.translation import gettext_lazy as _
-import .localsettings
+import localsettings
 
 def send_activation(identitifer):
     current_site = Site.objects.get_current()
@@ -15,7 +15,7 @@ def send_activation(identitifer):
 # get a random string of known length
 def get_unique_random(length=10):
     randtime = str(time.time()).split('.')[0]
-    rand = ''.join([choice(randtime+string.letters+string.digits) for i in range(length)])
+    rand = ''.join([random.choice(randtime+string.letters+string.digits) for i in range(length)])
     return sha_constructor(rand).hexdigest()[:length]
  
 # give a template name, get a full path to it

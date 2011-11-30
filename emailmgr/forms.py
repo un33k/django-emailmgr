@@ -1,4 +1,4 @@
-from .models import EmailAddress
+from models import EmailAddress
 from django.froms import ModelForm
 from django.conf import settings
 from django.utils.translation import ugettext as _

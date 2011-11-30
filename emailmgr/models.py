@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
-from .utils import get_unique_random
+from utils import get_unique_random
 
 class EmailAddress(models.Model):
 
@@ -9,7 +9,7 @@ class EmailAddress(models.Model):
     email = models.EmailField(_("Email Address"))
     is_primary = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
-    identifier = models.CharField(default=get_unique_random(20).lower())
+    identifier = models.CharField(max_length=255, default=get_unique_random(20).lower())
 
     class Meta:
         verbose_name = _("email address")
