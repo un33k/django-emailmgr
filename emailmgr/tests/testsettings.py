@@ -1,4 +1,5 @@
 import os
+CUR_DIR = os.path.abspath(os.path.dirname(__file__))
 
 DEBUG = TEMPLATE_DEBUG = True
 MAIN_DOMAIN_NAME = "example.com"
@@ -18,7 +19,14 @@ INSTALLED_APPS = [
     'emailmgr',
 ]
 ROOT_URLCONF = 'emailmgr.urls'
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+TEMPLATE_LOADERS = [
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+]
 
 
+TEMPLATE_DIRS = os.path.join(CUR_DIR, "templates")
 
 

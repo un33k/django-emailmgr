@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block www_title %}{{block.super}} - Add Email{% endblock www_title%}
+
+{% block body_content %}
+    <form method="post" action="">
+        <table>{{ form.as_table }}</table>
+        <input type="submit" value="Add Email"/>
+    </form>
+{% endblock %}

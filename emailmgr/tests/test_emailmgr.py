@@ -52,7 +52,7 @@ class EmailTestCase(TestCase):
 
 
     def test_email_add(self):
-        # import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         retval = self.client.login(username='val', password='1pass')
         self.failUnless(retval)
 
