@@ -20,4 +20,3 @@ class EmailAddress(models.Model):
         return u"%s (%s)" % (self.email, self.user.username)
 
 
-

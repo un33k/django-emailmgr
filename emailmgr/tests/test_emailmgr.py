@@ -35,7 +35,7 @@ class EmailTestCase(TestCase):
         # test a duplicated email address
         form = forms.EmailAddressForm(user=user, data={'email': 'mike@example.com'})
         self.failIf(form.is_valid())
-        self.assertEqual(form.errors['email'],[u"Email address is already in use."])
+        self.assertEqual(form.errors['email'],[u"This email address already in use."])
 
         # test against EmailAddress.email
         email = EmailAddress(**{'user': user, 'email': 'alvin@example.com'})
@@ -44,7 +44,7 @@ class EmailTestCase(TestCase):
         # test a duplicated email address
         form = forms.EmailAddressForm(user=user, data={'email': 'alvin@example.com'})
         self.failIf(form.is_valid())
-        self.assertEqual(form.errors['email'],[u"Email address is already in use."])
+        self.assertEqual(form.errors['email'],[u"This email address already in use."])
 
         # test a unique email address
         form = forms.EmailAddressForm(user=user, data={'email': 'sam@example.com'})
@@ -56,9 +56,13 @@ class EmailTestCase(TestCase):
         retval = self.client.login(username='val', password='1pass')
         self.failUnless(retval)
 
-        response = self.client.get(reverse('emailmgr_email_add'))
+        args = {'email': 'new@example.com'}
+        response = self.client.post(reverse('emailmgr_email_add'), args)        
+        
         print response
 
+        EmailAddress.objects.all()
+        
         # # # authenticate the user
         # # user = authenticate(username='val', password='1secret')
         # # self.failUnless(user)
