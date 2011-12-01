@@ -24,12 +24,8 @@ def get_template(name):
     return os.path.join(getattr(defaults, "EMAIL_MGR_TEMPLATE_PATH"), name)
 
 
-def create_email_address(user=None):
-    pass
 
 
 
-def delete_users_email_addresses(user=None):
-    pass
 
 
