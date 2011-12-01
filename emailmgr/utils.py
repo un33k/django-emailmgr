@@ -12,6 +12,7 @@ import defaults
 def send_activation(identitifer):
     current_site = Site.objects.get_current()
 
+
 # get a random string of known length
 def get_unique_random(length=10):
     randtime = str(time.time()).split('.')[0]

@@ -22,7 +22,7 @@ def email_add(request):
         form = EmailAddressForm(user=request.user, data=request.POST)
         if form.is_valid():
             form.save()
-            Msg.add_message (request, Msg.SUCCESS, _('email added'))
+            Msg.add_message (request, Msg.SUCCESS, _('email address added'))
             return HttpResponseRedirect(reverse('emailmgr_email_list'))
     else:
         form = EmailAddressForm(user=request.user)

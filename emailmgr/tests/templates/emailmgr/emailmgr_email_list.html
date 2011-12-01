@@ -8,7 +8,9 @@
         {% if e.is_primary %}
             Primary
         {% else %}
-            {% if not e.is_active %}
+            {% if e.is_active %}
+                Delete Email
+            {% else %}
                 Confirm Email
             {% endif %}
         {% endif %}
