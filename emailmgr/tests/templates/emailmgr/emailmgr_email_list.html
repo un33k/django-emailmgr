@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block www_title %}{{block.super}} - Email List{% endblock www_title%}
+
+{% block www_content %}
+    {% for e in emails_list %}
+        {{e.email}} - 
+        {% if e.is_primary %}
+            Primary
+        {% else %}
+            {% if not e.is_active %}
+                Confirm Email
+            {% endif %}
+        {% endif %}
+    {% endfor %} 
+    
+    <form method="post" action="">
+        {{ add_email_form.as_p }}
+        <input type="submit" value="Add Email"/>
+    </form>
+{% endblock www_content %}

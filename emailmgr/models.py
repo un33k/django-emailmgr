@@ -5,7 +5,7 @@ from utils import get_unique_random
 
 class EmailAddress(models.Model):
 
-    user = models.OneToOneField(User, related_name="%(class)s", unique=True)
+    user = models.ForeignKey(User, related_name="%(class)s")
     email = models.EmailField(_("Email Address"))
     is_primary = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)

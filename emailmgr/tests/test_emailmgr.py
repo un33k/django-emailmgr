@@ -56,29 +56,59 @@ class EmailTestCase(TestCase):
         retval = self.client.login(username='val', password='1pass')
         self.failUnless(retval)
 
-        args = {'email': 'new@example.com'}
+        args = {'email': 'new1@example.com'}
         response = self.client.post(reverse('emailmgr_email_add'), args)        
+        self.assertRedirects(response, reverse('emailmgr_email_list'))
+
+        # make sure the email is saved
+        e = EmailAddress.objects.all()
+        self.failUnless(len(e)==1)
+        self.failUnless(e[0].email=='new1@example.com')
+
+        # ensure duplicate email address are rejected
+        args = {'email': 'new1@example.com', 'follow': True}
+        response = self.client.post(reverse('emailmgr_email_add'), args)        
+        self.assertContains(response, "This email address already in use.", status_code=200)
         
-        print response
-
-        EmailAddress.objects.all()
+        # ensure multiple emails per user are accepted
+        args = {'email': 'new2@example.com', 'follow': True}
+        response = self.client.post(reverse('emailmgr_email_add'), args)        
+        self.assertNotContains(response, "This email address already in use.", status_code=302)
         
-        # # # authenticate the user
-        # # user = authenticate(username='val', password='1secret')
-        # # self.failUnless(user)
-        # #     
-        # # # user is not authenticated yet, verify
-        # # self.failUnless(self.user.is_authenticated())
-        # # 
-        # response = self.client.get(reverse('emailmgr_email_add'))
-        # # 
-        # #response = self.client.post('/login/', {'username': 'mike', 'password': '2secret'})
-        # print response
+        # make sure the email is in our database
+        e = EmailAddress.objects.all()
+        self.failUnless(len(e)==2)
+        self.failUnless(e[0].email=='new1@example.com')
+        self.failUnless(e[1].email=='new2@example.com')
+        self.failUnless(e[0].user==e[1].user)
 
 
+    def test_email_list(self):
+        # establish a session
+        retval = self.client.login(username='val', password='1pass')
+        self.failUnless(retval)
 
+        # add few emails to user
+        args = {'email': 'new1@example.com', 'follow': True}
+        response = self.client.post(reverse('emailmgr_email_add'), args) 
+        self.assertNotContains(response, "This email address already in use.", status_code=302)
 
+        args = {'email': 'new2@example.com', 'follow': True}
+        response = self.client.post(reverse('emailmgr_email_add'), args)        
+        self.assertNotContains(response, "This email address already in use.", status_code=302)
 
+        # verify that all emails were added
+        e = EmailAddress.objects.all()
+        self.failUnless(len(e))
+
+        # list all email addresses
+        response = self.client.post(reverse('emailmgr_email_list'))        
+        self.assertNotContains(response, "This email address already in use.", status_code=200)
+        self.assertContains(response, "example.com", count=len(e), status_code=200)
+        self.assertContains(response, "Confirm Email", count=len(e), status_code=200)
+
+        # make sure the option of adding new email is pased in to template
+        self.assertContains(response, "id_email", count=2, status_code=200)
 
 
 
