@@ -81,6 +81,7 @@ class EmailTestCase(TestCase):
         self.failUnless(e[0].email=='new1@example.com')
         self.failUnless(e[1].email=='new2@example.com')
         self.failUnless(e[0].user==e[1].user)
+        self.failIf(e[0].identifier == e[1].identifier)
 
 
     def test_email_list(self):
@@ -154,12 +155,91 @@ class EmailTestCase(TestCase):
         e = EmailAddress.objects.all()
         self.failUnless(len(e)==2)
 
-        # delete the first email
-        path = reverse('emailmgr_email_activate', kwargs={'identifier': e[0].identifier})
+        # send activation email for the first email
+        path = reverse('emailmgr_email_send_activation', kwargs={'identifier': e[0].identifier})
         response = self.client.get(path, follow=True)        
         self.assertContains(response, "example.com", count=2, status_code=200)
         self.assertContains(response, "Confirm Email", count=2, status_code=200)
         self.assertContains(response, "activation email sent", count=1, status_code=200)
+
+        # email is out, but pretent we have the email, so activate the first email
+        path = reverse('emailmgr_email_activate', kwargs={'identifier': e[0].identifier})
+        response = self.client.get(path, follow=True)        
+        self.assertContains(response, "example.com", count=2, status_code=200)
+        self.assertContains(response, "Confirm Email", count=1, status_code=200)
+        self.assertContains(response, "email address is now active", count=1, status_code=200)
+
+        e = EmailAddress.objects.all()
+        self.failUnless(len(e)==2)
+        self.failUnless(e[0].is_active)
+        
+
+    def test_email_make_primary(self):
+        # establish a session
+        retval = self.client.login(username='val', password='1pass')
+        self.failUnless(retval)
+
+        # add few emails to user
+        args = {'email': 'new1@example.com', 'follow': True}
+        response = self.client.post(reverse('emailmgr_email_add'), args) 
+        self.assertNotContains(response, "This email address already in use.", status_code=302)
+
+        args = {'email': 'new2@example.com', 'follow': True}
+        response = self.client.post(reverse('emailmgr_email_add'), args)        
+        self.assertNotContains(response, "This email address already in use.", status_code=302)
+
+        # verify that all emails were added
+        e = EmailAddress.objects.all()
+        self.failUnless(len(e)==2)
+
+        # send activation email for the first email
+        path = reverse('emailmgr_email_send_activation', kwargs={'identifier': e[0].identifier})
+        response = self.client.get(path, follow=True)        
+        self.assertContains(response, "example.com", count=2, status_code=200)
+        self.assertContains(response, "Confirm Email", count=2, status_code=200)
+        self.assertContains(response, "activation email sent", count=1, status_code=200)
+
+        # email is out, but pretent we have the email, so activate the first email
+        path = reverse('emailmgr_email_activate', kwargs={'identifier': e[0].identifier})
+        response = self.client.get(path, follow=True)        
+        self.assertContains(response, "example.com", count=2, status_code=200)
+        self.assertContains(response, "Confirm Email", count=1, status_code=200)
+        self.assertContains(response, "email address is now active", count=1, status_code=200)
+
+        e = EmailAddress.objects.all()
+        self.failUnless(len(e)==2)
+        self.failUnless(e[0].is_active)
+        
+        # make sure primary email address in User object is not in Email list
+        u = User.objects.get(username__iexact='val')
+        self.failUnless(u)
+        self.failIf(u.email == e[0].email)
+
+        # make the active one primary
+        path = reverse('emailmgr_email_make_primary', kwargs={'identifier': e[0].identifier})
+        response = self.client.get(path, follow=True)        
+        self.assertContains(response, "example.com", count=2, status_code=200)
+        self.assertContains(response, "Confirm Email", count=1, status_code=200)
+        self.assertContains(response, "Primary", count=1, status_code=200)
+        self.assertContains(response, "primary address changed", count=1, status_code=200)
+
+        # make sure we still have both emails and first is active
+        e = EmailAddress.objects.all()
+        self.failUnless(len(e)==2)
+        self.failUnless(e[0].is_active)
+        self.failUnless(e[0].is_primary)
+        self.failIf(e[1].is_primary)
+        
+        # make sure primary email address is in User object
+        u = User.objects.get(username__iexact='val')
+        self.failUnless(u)
+        self.failUnless(u.email == e[0].email)
+
+
+
+
+
+
 
 
 

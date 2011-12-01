@@ -37,6 +37,8 @@ def email_delete(request, identifier="somekey"):
     email = get_object_or_404(EmailAddress, identifier__iexact=identifier.lower())
     if email.email == request.user.email:
         Msg.add_message (request, Msg.ERROR, _('cannot remove primary email address'))
+    elif email.user != request.user:
+        Msg.add_message (request, Msg.ERROR, _('email address is not associated with this account'))
     else:
         email.delete()
         Msg.add_message (request, Msg.SUCCESS, _('email address removed'))
@@ -48,15 +50,16 @@ def email_delete(request, identifier="somekey"):
 def email_make_primary(request, identifier="somekey"):
     email = get_object_or_404(EmailAddress, identifier__iexact=identifier.lower())
     if email.is_active:
-        if email_is_primary:
-            Msg.add_message (request, Msg.SUCCESS, _('email is already primary'))
+        if email.is_primary:
+            Msg.add_message (request, Msg.SUCCESS, _('email address is already primary'))
         else:
             request.user.email = email.email
             request.user.save()
             email.is_primary = True
+            email.save()
             Msg.add_message (request, Msg.SUCCESS, _('primary address changed'))
     else:
-        Msg.add_message (request, Msg.SUCCESS, _('email must be activated first'))
+        Msg.add_message (request, Msg.SUCCESS, _('email address must be activated first'))
 
     return HttpResponseRedirect(reverse('emailmgr_email_list'))
 
@@ -65,7 +68,20 @@ def email_make_primary(request, identifier="somekey"):
 def email_activate(request, identifier="somekey"):
     email = get_object_or_404(EmailAddress, identifier__iexact=identifier.lower())
     if email.is_active:
-        Msg.add_message (request, Msg.SUCCESS, _('email already activated'))
+        Msg.add_message (request, Msg.SUCCESS, _('email address already active'))
+    else:
+        email.is_active = True
+        email.save()
+        Msg.add_message (request, Msg.SUCCESS, _('email address is now active'))
+
+    return HttpResponseRedirect(reverse('emailmgr_email_list'))
+
+
+@login_required
+def email_send_activation(request, identifier="somekey"):
+    email = get_object_or_404(EmailAddress, identifier__iexact=identifier.lower())
+    if email.is_active:
+        Msg.add_message (request, Msg.SUCCESS, _('email address already activated'))
     else:
         send_activation(identifier)
         Msg.add_message (request, Msg.SUCCESS, _('activation email sent'))
