@@ -99,7 +99,7 @@ class EmailTestCase(TestCase):
 
         # verify that all emails were added
         e = EmailAddress.objects.all()
-        self.failUnless(len(e))
+        self.failUnless(len(e)==2)
 
         # list all email addresses
         response = self.client.post(reverse('emailmgr_email_list'))        
@@ -110,5 +110,29 @@ class EmailTestCase(TestCase):
         # make sure the option of adding new email is pased in to template
         self.assertContains(response, "id_email", count=2, status_code=200)
 
+
+    def test_email_delete(self):
+        # establish a session
+        retval = self.client.login(username='val', password='1pass')
+        self.failUnless(retval)
+
+        # add few emails to user
+        args = {'email': 'new1@example.com', 'follow': True}
+        response = self.client.post(reverse('emailmgr_email_add'), args) 
+        self.assertNotContains(response, "This email address already in use.", status_code=302)
+
+        args = {'email': 'new2@example.com', 'follow': True}
+        response = self.client.post(reverse('emailmgr_email_add'), args)        
+        self.assertNotContains(response, "This email address already in use.", status_code=302)
+
+        # verify that all emails were added
+        e = EmailAddress.objects.all()
+        self.failUnless(len(e)==2)
+
+        # delete the first email
+        path = reverse('emailmgr_email_delete', kwargs={'identifier': e[0].identifier})
+        response = self.client.get(path, follow=True)        
+        self.assertContains(response, "example.com", count=1, status_code=200)
+        self.assertContains(response, "Confirm Email", count=1, status_code=200)
 
 

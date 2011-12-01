@@ -35,7 +35,7 @@ def email_add(request):
 @login_required
 def email_delete(request, identifier="somekey"):
     email = get_object_or_404(EmailAddress, identifier__iexact=identifier.lower())
-    if email.email == user.email:
+    if email.email == request.user.email:
         Msg.add_message (request, Msg.ERROR, _('cannot remove primary email address'))
     else:
         email.delete()
