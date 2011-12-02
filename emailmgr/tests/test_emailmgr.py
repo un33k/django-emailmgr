@@ -272,8 +272,8 @@ class EmailActivateTestCase(TestCase):
         e = EmailAddress.objects.get(identifier__iexact=e[1].identifier)
         self.failUnless(e.is_active)
 
-class EmailActivateTestCase(TestCase):
-    """Tests for Django emailmgr -- Activate Email """
+class EmailMakePrimaryTestCase(TestCase):
+    """Tests for Django emailmgr -- Make Primary """
     def setUp(self):
         #create a base test user
         self.user = User.objects.create_user('primary', 'primary@example.com', '1pass')

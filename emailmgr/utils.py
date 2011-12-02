@@ -7,7 +7,6 @@ from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.utils.hashcompat import sha_constructor
 from django.utils.translation import gettext_lazy as _
-
 import defaults
 
 # some people might like to user mailer by jtauber, accomodate them
