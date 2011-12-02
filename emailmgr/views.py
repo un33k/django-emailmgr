@@ -54,14 +54,14 @@ def email_make_primary(request, identifier="somekey"):
             Msg.add_message (request, Msg.SUCCESS, _('email address is already primary'))
         else:
             emails = EmailAddress.objects.filter(user=email.user)
-            for email in emails:
-                email.is_primary = False
-                email.save()
+            for e in emails:
+                e.is_primary = False
+                e.save()
     
-            e.user.email = e.email
-            e.user.save()
-            e.is_primary = True
-            e.save()
+            email.user.email = email.email
+            email.user.save()
+            email.is_primary = True
+            email.save()
             Msg.add_message (request, Msg.SUCCESS, _('primary address changed'))
     else:
         Msg.add_message (request, Msg.SUCCESS, _('email address must be activated first'))
