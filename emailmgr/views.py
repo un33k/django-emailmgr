@@ -33,21 +33,13 @@ def email_add(request):
                               )
 
 @login_required
-def email_delete(request, identifier="somekey"):
-    email = get_object_or_404(EmailAddress, identifier__iexact=identifier.lower())
-    if email.email == request.user.email:
-        Msg.add_message (request, Msg.ERROR, _('cannot remove primary email address'))
-    elif email.user != request.user:
-        Msg.add_message (request, Msg.ERROR, _('email address is not associated with this account'))
-    else:
-        email.delete()
-        Msg.add_message (request, Msg.SUCCESS, _('email address removed'))
-
-    return HttpResponseRedirect(reverse('emailmgr_email_list'))
-
-
-@login_required
 def email_make_primary(request, identifier="somekey"):
+    """
+    User is logged in, has a second email that is already activated and 
+    wants to make that the primary email address.
+    The User objects' email address will also be replace with this newly
+    primary email address, so Django internals work it the new primary address too
+    """
     email = get_object_or_404(EmailAddress, identifier__iexact=identifier.lower())
     if email.is_active:
         if email.is_primary:
@@ -70,7 +62,30 @@ def email_make_primary(request, identifier="somekey"):
 
 
 @login_required
+def email_send_activation(request, identifier="somekey"):
+    """
+    The user is logged in, has added a new email address to his/her account.
+    User can do anything with the newly added email, unless it is first activated.
+    This function will send an activation email to the currently primary email address 
+    associated with the User's account
+    """
+    email = get_object_or_404(EmailAddress, identifier__iexact=identifier.lower())
+    if email.is_active:
+        Msg.add_message (request, Msg.SUCCESS, _('email address already activated'))
+    else:
+        send_activation(request, identifier)
+        Msg.add_message (request, Msg.SUCCESS, _('activation email sent'))
+
+    return HttpResponseRedirect(reverse('emailmgr_email_list'))
+
+
+@login_required
 def email_activate(request, identifier="somekey"):
+    """
+    User is already logged in and the activation link will trigger the email address
+    in question to be activated. If the account is already active, then a message is 
+    put in the message buffer indicating that the email is already active
+    """
     email = get_object_or_404(EmailAddress, identifier__iexact=identifier.lower())
     if email.is_active:
         Msg.add_message (request, Msg.SUCCESS, _('email address already active'))
@@ -81,22 +96,29 @@ def email_activate(request, identifier="somekey"):
 
     return HttpResponseRedirect(reverse('emailmgr_email_list'))
 
-
 @login_required
-def email_send_activation(request, identifier="somekey"):
+def email_delete(request, identifier="somekey"):
+    """
+    Email needs to be removed from User's account, primary email address cannot be removed
+    """
     email = get_object_or_404(EmailAddress, identifier__iexact=identifier.lower())
-    if email.is_active:
-        Msg.add_message (request, Msg.SUCCESS, _('email address already activated'))
+    if email.email == request.user.email:
+        Msg.add_message (request, Msg.ERROR, _('cannot remove primary email address'))
+    elif email.user != request.user:
+        Msg.add_message (request, Msg.ERROR, _('email address is not associated with this account'))
     else:
-        send_activation(identifier)
-        Msg.add_message (request, Msg.SUCCESS, _('activation email sent'))
+        email.delete()
+        Msg.add_message (request, Msg.SUCCESS, _('email address removed'))
 
     return HttpResponseRedirect(reverse('emailmgr_email_list'))
 
 
 @login_required
 def email_list(request):
-    
+    """
+    All email address associated with User account will be passed into the template as a list
+    An ``add`` email form will be passed in the template so user can add new email inline
+    """
     email_add_form = EmailAddressForm(user=request.user)
     emails_list = EmailAddress.objects.all()
     return render_to_response(get_template('emailmgr_email_list.html'),

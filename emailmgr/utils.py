@@ -7,11 +7,14 @@ from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.utils.hashcompat import sha_constructor
 from django.utils.translation import gettext_lazy as _
+
 import defaults
 
-def send_activation(identitifer):
-    current_site = Site.objects.get_current()
-
+# some people might like to user mailer by jtauber, accomodate them
+if "mailer" in settings.INSTALLED_APPS:
+    from mailer import send_mail
+else:
+    from django.core.mail import send_mail
 
 # get a random string of known length
 def get_unique_random(length=10):
@@ -24,6 +27,31 @@ def get_template(name):
     return os.path.join(getattr(defaults, "EMAIL_MGR_TEMPLATE_PATH"), name)
 
 
+# send activation link to user's primary email address
+def send_activation(request, identifier):
+    # import pdb; pdb.set_trace()
+    this_site = Site.objects.get_current()
+    
+    # first try to use our views fuction to construct the activation path (deterministic)
+    # if views didn't reverse to a path, then use named url (less deterministic as it is user configurable)
+    try:
+        p = reverse("emailargs.view.email_activate",args=[identifier])
+    except NoReverseMatch:
+        p = reverse('emailmgr_email_send_activation', kwargs={'identifier': identifier})
+            
+    proto = getattr(settings, "DEFAULT_HTTP_PROTOCOL", "")
+    if not proto:
+        if request.is_secure():
+            proto = "https"
+        else:
+            proto = "http"
+
+    url = u"%s://%s%s" % (proto, unicode(this_site.domain),p)
+    context = {"user": request.user, "activate_url": url, "this_site": this_site,"identifier": identifier,}
+    subject = render_to_string(get_template("email_activation_subject.txt"), context)
+    subject = "".join(subject.splitlines())
+    message = render_to_string(get_template("email_activation_message.txt"), context)
+    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [request.user.email])
 
 
 
