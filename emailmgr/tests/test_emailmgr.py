@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Unit tests for django bootup"""
+"""Unit tests for django emailmgr"""
 from django.conf import settings
 from django.test import TestCase
 from django.template import Context, Template

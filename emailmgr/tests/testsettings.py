@@ -1,3 +1,4 @@
+#this is a test settings for this app
 import os
 CUR_DIR = os.path.abspath(os.path.dirname(__file__))
 

@@ -1,10 +1,111 @@
-django-bootup
+django-emailmgr
 ================
 
-A Django  application that helps with Django User's email management".
+A Django application that helps with post registration email management".
 ``You can associate multiple email addresses to a single Django User.``
+
+This application comes into the picture only after a user has been created, activated
+and logged in.
+
+If your requirements is for email management prior to user registration you can 
+look at ``django-registration`` or ``django-email-confirmation``.
+
+This application was inspired by bitbucket.org's email management system as well as 
+the above mentioned applications:
+
 
 Current Features:
 _________________
+Assumption:
+    * - Django user has been created 
+    * - Either via proper registration and activation or via the admin interface or scripts
+    * - User has a valid email address
+    * - This application first looks for its templates in: EMAIL_MGR_TEMPLATE_PATH, then
+        it looks for <template_dir>/emailmgr/
+        * - This way, projects can place the required templates at a location of their choice
+            relative to the <tempalate_dir> of course
+        
+1. Latch on the ``post_save`` signals on (user) and execute the following:
+    A. Create an email address object with the following attributes
+        * - email = user.email
+        * - is_active = True
+        * - is_primary = True
+        * - identifier = a random string (used for activation)
+        * - Note: user login is not required
 
-1. Associate ``multiple`` email addresses to a Django User
+2. Latch on the ``post_delete`` signals on (user) and execute the following:
+    A. Delete all email address associated with this email address
+    
+3. Provide URL to:
+    A. Add an email address to the logged user's account:
+        * - http://example.com/email/add/, 
+        * - Email address is created and associated with the logged in user
+        * - Email address remains inactive and cannot be made primary
+        * - User is redirected to http://example.com/email/list/
+        * - ``emails_list`` and ``add_email_form`` are passed into the list template
+        
+    B. Delete an email address from a user account
+        * - http://example.com/email/delete/<identifier>/, 
+        * - identifier is passed into the email list template
+        * - Primary email address cannot be delete
+        * - Once the email is deleted, user is redirected to http://example.com/email/list/
+        
+    C. Send activation link for a newly added email address
+        * - http://example.com/email/send_activation/<identifier>/, 
+        * - identifier is passed into the email list template
+        * - activation email is sent to the logged in user's primary address
+        * - activation ``sent`` status is not tracked, all inactive emails remain inactive till activated
+        * - Once the email is sent, user is redirected to http://example.com/email/list/
+
+    D. Activate an email address when user clicks on an activation link
+        * - http://example.com/email/activate/<identifier>/,
+        * - link was emailed to user's primary email address
+        * - email will be activated (can be promoted to primary)
+        * - Once the email is activated, user is redirected to http://example.com/email/list/
+
+    E. Make an email the primary email
+        * - http://example.com/email/make_primary/<identifier>/,
+        * - identifier is passed into the email list template
+        * - Only activated email addresses can be promoted to be the primary email address
+        * - User.email is swapped out with the newly promoted primary email address
+        * - All other emails are set to NOT primary
+        * - Once the email is made primary, user is redirected to http://example.com/email/list/
+
+
+4. More to come ... patches & enhancements are welcomed (http://bitbucket.org/un33k/django-emailmgr)
+
+
+Usage
+=====
+
+A. Install django-emailmgr:
+    * _ Make sure you have python 2.6+ and can install from pypi
+        1. easy_install django-emailmgr
+        2. pip install django-emailmgr
+        3. git clone http://bitbucket.org/un33k/django-emailmgr
+            a. cd django-emailmgr
+            b. run python setup.py
+        4. wget https://github.com/un33k/django-emailmgr/zipball/master
+            a. unzip the downloaded file
+            b. cd into django-emailmgr directory
+            c. run python setup.py
+
+    * _ Stick ``"emailmgr"`` in ``INSTALLED_APPS``, right after all other Django specific Apps
+    * _ Follow the instruction in the ``Current Features`` at the top of this file for usage.
+    * _ Run syncdb and enjoy
+
+ToDo
+=====
+clean up README
+add more goodies
+
+
+
+
+
+
+
+
+
+
+
