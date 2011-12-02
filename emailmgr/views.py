@@ -27,7 +27,7 @@ def email_add(request):
     else:
         form = EmailAddressForm(user=request.user)
 
-    return render_to_response(get_template('emailmgr_email_add.html'),
+    return render_to_response(get_template('emailmgr_email_list.html'),
                               {'add_email_form': form},
                               context_instance=RequestContext(request)
                               )
