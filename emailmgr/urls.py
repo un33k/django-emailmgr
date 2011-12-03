@@ -32,7 +32,7 @@ urlpatterns = patterns('',
         name='emailmgr_email_delete'
         ),
     url(
-        r'^email/list/$',
+        r'^email/$',
         email_list,
         name='emailmgr_email_list'
         ),

@@ -23,12 +23,15 @@ def email_add(request):
         if form.is_valid():
             form.save()
             Msg.add_message (request, Msg.SUCCESS, _('email address added'))
-            return HttpResponseRedirect(reverse('emailmgr_email_list'))
     else:
         form = EmailAddressForm(user=request.user)
 
+    emails_list = EmailAddress.objects.all()
     return render_to_response(get_template('emailmgr_email_list.html'),
-                              {'add_email_form': form},
+                              {
+                                'emails_list': emails_list,
+                                'add_email_form': form
+                              },
                               context_instance=RequestContext(request)
                               )
 
@@ -119,12 +122,12 @@ def email_list(request):
     All email address associated with User account will be passed into the template as a list
     An ``add`` email form will be passed in the template so user can add new email inline
     """
-    email_add_form = EmailAddressForm(user=request.user)
+    form = EmailAddressForm(user=request.user)
     emails_list = EmailAddress.objects.all()
     return render_to_response(get_template('emailmgr_email_list.html'),
                               {
                                 'emails_list': emails_list,
-                                'add_email_form': email_add_form
+                                'add_email_form': form
                               },
                               context_instance=RequestContext(request)
                               )

@@ -101,8 +101,8 @@ class EmailAddTestCase(TestCase):
         self.failUnless(retval)
         
         args = {'email': 'add1@example.com'}
-        response = self.client.post(reverse('emailmgr_email_add'), args)        
-        self.assertRedirects(response, reverse('emailmgr_email_list'))
+        response = self.client.post(reverse('emailmgr_email_add'), args)
+        self.assertContains(response, "email address added", status_code=200)
 
         # make sure the email is saved
         e = EmailAddress.objects.get(email='add1@example.com')
@@ -116,7 +116,7 @@ class EmailAddTestCase(TestCase):
         # ensure multiple emails per user are accepted
         args = {'email': 'add2@example.com', 'follow': True}
         response = self.client.post(reverse('emailmgr_email_add'), args)        
-        self.assertNotContains(response, "This email address already in use.", status_code=302)
+        self.assertNotContains(response, "This email address already in use.", status_code=200)
         
         # make sure the new email is in our database
         e = EmailAddress.objects.get(email='add2@example.com')
@@ -157,11 +157,11 @@ class EmailListTestCase(TestCase):
         # add few emails to user
         args = {'email': 'list1@example.com', 'follow': True}
         response = self.client.post(reverse('emailmgr_email_add'), args) 
-        self.assertNotContains(response, "This email address already in use.", status_code=302)
+        self.assertNotContains(response, "This email address already in use.", status_code=200)
 
         args = {'email': 'list2@example.com', 'follow': True}
         response = self.client.post(reverse('emailmgr_email_add'), args)        
-        self.assertNotContains(response, "This email address already in use.", status_code=302)
+        self.assertNotContains(response, "This email address already in use.", status_code=200)
 
         # verify that all emails were added, 2 added by us and 1 by user creation
         e = EmailAddress.objects.all()
@@ -191,11 +191,11 @@ class EmailDeleteTestCase(TestCase):
         # add few emails to user
         args = {'email': 'delete1@example.com', 'follow': True}
         response = self.client.post(reverse('emailmgr_email_add'), args) 
-        self.assertNotContains(response, "This email address already in use.", status_code=302)
+        self.assertNotContains(response, "This email address already in use.", status_code=200)
 
         args = {'email': 'delete2@example.com', 'follow': True}
         response = self.client.post(reverse('emailmgr_email_add'), args)        
-        self.assertNotContains(response, "This email address already in use.", status_code=302)
+        self.assertNotContains(response, "This email address already in use.", status_code=200)
 
         # verify that all emails were added, 2 by us, 1 by user creation
         e = EmailAddress.objects.all()
@@ -245,11 +245,11 @@ class EmailActivateTestCase(TestCase):
         # add few emails to user
         args = {'email': 'activate1@example.com', 'follow': True}
         response = self.client.post(reverse('emailmgr_email_add'), args) 
-        self.assertNotContains(response, "This email address already in use.", status_code=302)
+        self.assertNotContains(response, "This email address already in use.", status_code=200)
 
         args = {'email': 'activate2@example.com', 'follow': True}
         response = self.client.post(reverse('emailmgr_email_add'), args)        
-        self.assertNotContains(response, "This email address already in use.", status_code=302)
+        self.assertNotContains(response, "This email address already in use.", status_code=200)
 
         # verify that all emails were added, 2 by us, 1 by user creation
         e = EmailAddress.objects.all()
@@ -286,11 +286,11 @@ class EmailMakePrimaryTestCase(TestCase):
         # add few emails to user
         args = {'email': 'primary1@example.com', 'follow': True}
         response = self.client.post(reverse('emailmgr_email_add'), args) 
-        self.assertNotContains(response, "This email address already in use.", status_code=302)
+        self.assertNotContains(response, "This email address already in use.", status_code=200)
 
         args = {'email': 'primary2@example.com', 'follow': True}
         response = self.client.post(reverse('emailmgr_email_add'), args)        
-        self.assertNotContains(response, "This email address already in use.", status_code=302)
+        self.assertNotContains(response, "This email address already in use.", status_code=200)
 
         # verify that all emails were added, 2 by us, 1 by user creation
         e = EmailAddress.objects.all()
