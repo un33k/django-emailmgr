@@ -27,7 +27,7 @@ def email_add(request):
     else:
         form = EmailAddressForm(user=request.user)
 
-    emails_list = EmailAddress.objects.all()
+    emails_list = EmailAddress.objects.filter(user=request.user).order_by('-is_primary')
     return render_to_response(get_template('emailmgr_email_list.html'),
                               {
                                 'emails_list': emails_list,
