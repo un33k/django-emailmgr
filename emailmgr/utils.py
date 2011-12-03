@@ -36,7 +36,7 @@ def send_activation(request, identifier):
     try:
         p = reverse("emailargs.view.email_activate",args=[identifier])
     except NoReverseMatch:
-        p = reverse('emailmgr_email_send_activation', kwargs={'identifier': identifier})
+        p = reverse('emailmgr_email_activate', kwargs={'identifier': identifier})
             
     proto = getattr(settings, "DEFAULT_HTTP_PROTOCOL", "")
     if not proto:

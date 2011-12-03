@@ -3,21 +3,30 @@
 {% block www_title %}{{block.super}} - Email List{% endblock www_title%}
 
 {% block www_content %}
+
+<section id="account-settings" data-action="">
     {% for e in emails_list %}
-        {{e.email}} - 
+        {{e.email}} -
         {% if e.is_primary %}
-            Primary
+            Primary Email<br/>
         {% else %}
             {% if e.is_active %}
-                Delete Email
+                <a href= "{% url emailmgr_email_delete e.identifier %}">Delete</a> |
+                <a href= "{% url emailmgr_email_make_primary e.identifier %}">Make Primary</a>
+                <br/>
             {% else %}
-                Confirm Email
+                <a href= "{% url emailmgr_email_send_activation e.identifier %}">Activate</a> |
+                <a href= "{% url emailmgr_email_delete e.identifier %}">Delete</a>
+                <br/>
             {% endif %}
         {% endif %}
     {% endfor %} 
-    
-    <form method="post" action="">
-        {{ add_email_form.as_p }}
-        <input type="submit" value="Add Email"/>
+    <form action="{% url emailmgr_email_add %}" enctype="multipart/form-data" method="post" accept-charset="utf-8">{% csrf_token %}
+        <fieldset>
+            <legend>Add Email</legend>
+            {{ add_email_form.as_p }}
+        </fieldset>
+        <input type="submit" value="Add Email" />
     </form>
+</section>
 {% endblock www_content %}
