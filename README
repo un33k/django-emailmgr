@@ -72,7 +72,7 @@ Assumption:
         * - Once the email is made primary, user is redirected to http://example.com/email/list/
 
 
-4. More to come ... patches & enhancements are welcomed (http://bitbucket.org/un33k/django-emailmgr)
+4. More to come ... patches & enhancements are welcomed (http://github.com/un33k/django-emailmgr)
 
 
 Usage
@@ -82,7 +82,7 @@ A. Install django-emailmgr:
     * _ Make sure you have python 2.6+ and can install from pypi
         1. easy_install django-emailmgr
         2. pip install django-emailmgr
-        3. git clone http://bitbucket.org/un33k/django-emailmgr
+        3. git clone http://github.com/un33k/django-emailmgr
             a. cd django-emailmgr
             b. run python setup.py
         4. wget https://github.com/un33k/django-emailmgr/zipball/master
