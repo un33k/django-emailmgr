@@ -1,7 +1,7 @@
 django-emailmgr
 ================
 
-A Django application that helps with post registration email management".
+Django Manager is a Django application that helps with post registration email management".
 ``You can associate multiple email addresses to a single Django User.``
 
 This application comes into the picture only after a user has been created, activated
