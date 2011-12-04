@@ -90,13 +90,17 @@ def email_activate(request, identifier="somekey"):
     in question to be activated. If the account is already active, then a message is 
     put in the message buffer indicating that the email is already active
     """
-    email = get_object_or_404(EmailAddress, identifier__iexact=identifier.lower())
-    if email.is_active:
-        Msg.add_message (request, Msg.SUCCESS, _('email address already active'))
+    try:
+        email = EmailAddress.objects.get(identifier__iexact=identifier.lower())
+    except EmailAddress.DoesNotExist:
+        Msg.add_message (request, Msg.ERROR, _('email address not found'))
     else:
-        email.is_active = True
-        email.save()
-        Msg.add_message (request, Msg.SUCCESS, _('email address is now active'))
+        if email.is_active:
+            Msg.add_message (request, Msg.SUCCESS, _('email address already active'))
+        else:
+            email.is_active = True
+            email.save()
+            Msg.add_message (request, Msg.SUCCESS, _('email address is now active'))
 
     return HttpResponseRedirect(reverse('emailmgr_email_list'))
 

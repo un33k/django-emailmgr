@@ -1,17 +1,17 @@
 django-emailmgr
 ================
 
-Django Manager is a Django application that helps with post registration email management".
+Django emailmgr is an application that helps with post registration email management".
 ``You can associate multiple email addresses to a single Django User.``
 
 This application comes into the picture only after a user has been created, activated
 and logged in.
 
-If your requirements is for email management prior to user registration you can 
+If your requirements is for email management prior to user registration please take a 
 look at ``django-registration`` or ``django-email-confirmation``.
 
 This application was inspired by bitbucket.org's email management system as well as 
-the above mentioned applications:
+the mentioned applications.
 
 
 Current Features:
@@ -24,17 +24,28 @@ Assumption:
         it looks for <template_dir>/emailmgr/
         * - This way, projects can place the required templates at a location of their choice
             relative to the <tempalate_dir> of course
-        
-1. Latch on the ``post_save`` signals on (user) and execute the following:
+    * - Three templates are found in the template directory as stated above
+        * - email subject template - emailmgr_activation_subject.txt
+            * - extra context: current_site
+        * - email message body template - emailmgr_activation_message.txt
+            * - extra context: current_site, activate_url & user
+        * - email list & manipulation template - emailmgr_email_list.html
+            * - extra context: emails_list and add_email_form
+                * - email_list includes all emails for this users (primary email first)
+                * - add_email_form is a form for adding a new email address to user
+
+1. Latch on the ``post_save`` signals for (user) and execute the following:
     A. Create an email address object with the following attributes
         * - email = user.email
         * - is_active = True
         * - is_primary = True
         * - identifier = a random string (used for activation)
         * - Note: user login is not required
+        * - Note: email is only created if user has a valid email address
+        * - Note: this email is automatically considered as primary and activation is skipped
 
 2. Latch on the ``post_delete`` signals on (user) and execute the following:
-    A. Delete all email address associated with this email address
+    A. Delete all email addressed associated with the deleted user
     
 3. Provide URL to:
     A. Add an email address to the logged user's account:
@@ -42,33 +53,31 @@ Assumption:
         * - Email address is created and associated with the logged in user
         * - Email address remains inactive and cannot be made primary
         * - User is redirected to http://example.com/email/list/
-        * - ``emails_list`` and ``add_email_form`` are passed into the list template
+        * - ``emails_list`` and ``add_email_form`` are passed into the template
         
     B. Delete an email address from a user account
         * - http://example.com/email/delete/<identifier>/, 
-        * - identifier is passed into the email list template
+        * - Existing email address with the above identifier is deleted
         * - Primary email address cannot be delete
         * - Once the email is deleted, user is redirected to http://example.com/email/list/
         
-    C. Send activation link for a newly added email address
+    C. Send activation link for a newly added email address to user's primary email address
         * - http://example.com/email/send_activation/<identifier>/, 
-        * - identifier is passed into the email list template
-        * - activation email is sent to the logged in user's primary address
-        * - activation ``sent`` status is not tracked, all inactive emails remain inactive till activated
+        * - An activation email is sent to the logged in user's primary address
+        * - Note: all emails remain inactive unless activated
         * - Once the email is sent, user is redirected to http://example.com/email/list/
 
     D. Activate an email address when user clicks on an activation link
         * - http://example.com/email/activate/<identifier>/,
-        * - link was emailed to user's primary email address
-        * - email will be activated (can be promoted to primary)
+        * - Note: link was emailed to user's primary email address
+        * - Matched email will be activated (then eligible to be promoted to primary)
         * - Once the email is activated, user is redirected to http://example.com/email/list/
 
-    E. Make an email the primary email
+    E. Make an activated email address the primary email
         * - http://example.com/email/make_primary/<identifier>/,
-        * - identifier is passed into the email list template
         * - Only activated email addresses can be promoted to be the primary email address
-        * - User.email is swapped out with the newly promoted primary email address
-        * - All other emails are set to NOT primary
+        * - User.email is set to the newly promoted primary email address
+        * - Note: Only one email address can be set to primary
         * - Once the email is made primary, user is redirected to http://example.com/email/list/
 
 

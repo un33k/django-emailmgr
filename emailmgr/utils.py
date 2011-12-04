@@ -47,9 +47,9 @@ def send_activation(request, identifier):
 
     url = u"%s://%s%s" % (proto, unicode(this_site.domain),p)
     context = {"user": request.user, "activate_url": url, "this_site": this_site,"identifier": identifier,}
-    subject = render_to_string(get_template("email_activation_subject.txt"), context)
+    subject = render_to_string(get_template("emailmgr_activation_subject.txt"), context)
     subject = "".join(subject.splitlines())
-    message = render_to_string(get_template("email_activation_message.txt"), context)
+    message = render_to_string(get_template("emailmgr_activation_message.txt"), context)
     send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [request.user.email])
 
 
