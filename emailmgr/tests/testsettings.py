@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'emailmgr',
+    'south',
 ]
 ROOT_URLCONF = 'emailmgr.urls'
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
