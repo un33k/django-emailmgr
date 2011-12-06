@@ -11,7 +11,7 @@ class EmailAddressForm(ModelForm):
 
     class Meta:
         model = EmailAddress
-        exclude = ('user', 'is_primary', 'is_active', 'identifier')
+        exclude = ('user', 'is_primary', 'is_active', 'is_activation_sent', 'identifier')
 
     def clean_email(self):
         """

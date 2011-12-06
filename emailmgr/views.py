@@ -10,7 +10,7 @@ from models import EmailAddress
 from utils import send_activation, get_template
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
-
+from signals import user_added_email, user_sent_activation, user_activated_email
 
 @login_required
 def email_add(request):
@@ -21,7 +21,8 @@ def email_add(request):
     if request.method == 'POST':
         form = EmailAddressForm(user=request.user, data=request.POST)
         if form.is_valid():
-            form.save()
+            email = form.save()
+            user_added_email.send(sender=EmailAddress, email_address=email)
             Msg.add_message (request, Msg.SUCCESS, _('email address added'))
             form = EmailAddressForm(user=request.user)
     else:
@@ -80,6 +81,7 @@ def email_send_activation(request, identifier="somekey"):
         send_activation(request, identifier)
         email.is_activation_sent = True
         email.save()
+        user_sent_activation.send(sender=EmailAddress, email_address=email)
         Msg.add_message (request, Msg.SUCCESS, _('activation email sent'))
 
     return HttpResponseRedirect(reverse('emailmgr_email_list'))
@@ -102,6 +104,7 @@ def email_activate(request, identifier="somekey"):
         else:
             email.is_active = True
             email.save()
+            user_activated_email.send(sender=EmailAddress, email_address=email)
             Msg.add_message (request, Msg.SUCCESS, _('email address is now active'))
 
     return HttpResponseRedirect(reverse('emailmgr_email_list'))

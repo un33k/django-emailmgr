@@ -1,5 +1,12 @@
 This file lists all changes and fixes that have been made for django-emailmgr.
 
+* 5 Dec 2011 (0.5)
+1. Add is_activation_sent to track the status of activation emails
+
+* 3 Dec 2011 (0.4)
+1. Make sure only user's primary email address is shown in his profile and 
+   not anyone else's.
+  
 * 2 Dec 2011 (0.3)
 1. Make sure only user's primary email address is shown in his profile and 
    not anyone else's.
