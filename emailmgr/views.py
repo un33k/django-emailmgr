@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from forms import EmailAddressForm
 from models import EmailAddress
-from utils import send_activation, get_template
+from utils import send_activation, get_template, sort_email
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from signals import user_added_email, user_sent_activation, user_activated_email
@@ -27,8 +27,7 @@ def email_add(request):
             form = EmailAddressForm(user=request.user)
     else:
         form = EmailAddressForm(user=request.user)
-
-    emails_list = EmailAddress.objects.filter(user=request.user).order_by('-is_primary').order_by('-is_active')
+    emails_list = EmailAddress.objects.filter(user=request.user).order_by(*sort_email())
     return render_to_response(get_template('emailmgr_email_list.html'),
                               {
                                 'email_list': emails_list,
@@ -133,7 +132,7 @@ def email_list(request):
     An ``add`` email form will be passed in the template so user can add new email inline
     """
     form = EmailAddressForm(user=request.user)
-    emails_list = EmailAddress.objects.filter(user=request.user).order_by('-is_primary').order_by('-is_active')
+    emails_list = EmailAddress.objects.filter(user=request.user).order_by(*sort_email())
     return render_to_response(get_template('emailmgr_email_list.html'),
                               {
                                 'email_list': emails_list,

@@ -52,6 +52,8 @@ def send_activation(request, identifier):
     message = render_to_string(get_template("emailmgr_activation_message.txt"), context)
     send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [request.user.email])
 
+def sort_email():
+    return ['-is_primary', '-is_active', '-is_activation_sent']
 
 
 
