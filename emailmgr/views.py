@@ -27,11 +27,11 @@ def email_add(request):
     else:
         form = EmailAddressForm(user=request.user)
 
-    emails_list = EmailAddress.objects.filter(user=request.user).order_by('-is_primary')
+    emails_list = EmailAddress.objects.filter(user=request.user).order_by('-is_primary').order_by('-is_active')
     return render_to_response(get_template('emailmgr_email_list.html'),
                               {
-                                'emails_list': emails_list,
-                                'add_email_form': form
+                                'email_list': emails_list,
+                                'email_form': form
                               },
                               context_instance=RequestContext(request)
                               )
@@ -78,6 +78,8 @@ def email_send_activation(request, identifier="somekey"):
         Msg.add_message (request, Msg.SUCCESS, _('email address already activated'))
     else:
         send_activation(request, identifier)
+        email.is_activation_sent = True
+        email.save()
         Msg.add_message (request, Msg.SUCCESS, _('activation email sent'))
 
     return HttpResponseRedirect(reverse('emailmgr_email_list'))
@@ -128,11 +130,11 @@ def email_list(request):
     An ``add`` email form will be passed in the template so user can add new email inline
     """
     form = EmailAddressForm(user=request.user)
-    emails_list = EmailAddress.objects.filter(user=request.user).order_by('-is_primary')
+    emails_list = EmailAddress.objects.filter(user=request.user).order_by('-is_primary').order_by('-is_active')
     return render_to_response(get_template('emailmgr_email_list.html'),
                               {
-                                'emails_list': emails_list,
-                                'add_email_form': form
+                                'email_list': emails_list,
+                                'email_form': form
                               },
                               context_instance=RequestContext(request)
                               )

@@ -5,7 +5,7 @@
 {% block www_content %}
 
 <section id="account-settings" data-action="">
-    {% for e in emails_list %}
+    {% for e in email_list %}
         {{e.email}} -
         {% if e.is_primary %}
             Primary Email<br/>
@@ -15,7 +15,11 @@
                 <a href= "{% url emailmgr_email_make_primary e.identifier %}">Make Primary</a>
                 <br/>
             {% else %}
-                <a href= "{% url emailmgr_email_send_activation e.identifier %}">Activate</a> |
+                {% if e.is_activation_sent %}
+                    <a href= "{% url emailmgr_email_send_activation e.identifier %}">Resend Activation</a> |
+                {% else %}
+                    <a href= "{% url emailmgr_email_send_activation e.identifier %}">Send Activation</a> |
+                {% endif %}
                 <a href= "{% url emailmgr_email_delete e.identifier %}">Delete</a>
                 <br/>
             {% endif %}
@@ -24,7 +28,7 @@
     <form action="{% url emailmgr_email_add %}" enctype="multipart/form-data" method="post" accept-charset="utf-8">{% csrf_token %}
         <fieldset>
             <legend>Add Email</legend>
-            {{ add_email_form.as_p }}
+            {{ email_form.as_p }}
         </fieldset>
         <input type="submit" value="Add Email" />
     </form>

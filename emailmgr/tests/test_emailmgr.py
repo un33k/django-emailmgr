@@ -171,7 +171,7 @@ class EmailListTestCase(TestCase):
         response = self.client.post(reverse('emailmgr_email_list'))        
         self.assertNotContains(response, "This email address already in use.", status_code=200)
         self.assertContains(response, "example.com", count=3, status_code=200)
-        self.assertContains(response, "Activate", count=2, status_code=200)
+        self.assertContains(response, "Send Activation", count=2, status_code=200)
 
         # make sure the option of adding new email is pased in to template
         self.assertContains(response, "id_email", count=2, status_code=200)
@@ -206,7 +206,7 @@ class EmailDeleteTestCase(TestCase):
         response = self.client.get(path, follow=True)        
         self.assertContains(response, "cannot remove primary email address", count=1, status_code=200)
         self.assertContains(response, "example.com", count=3, status_code=200)
-        self.assertContains(response, "Activate", count=2, status_code=200)
+        self.assertContains(response, "Send Activation", count=2, status_code=200)
         
         # delete the second email,
         path = reverse('emailmgr_email_delete', kwargs={'identifier': e[1].identifier})
@@ -214,7 +214,7 @@ class EmailDeleteTestCase(TestCase):
         self.assertNotContains(response, "cannot remove primary email address", status_code=200)
         self.assertContains(response, "email address removed", count=1, status_code=200)
         self.assertContains(response, "example.com", count=2, status_code=200)
-        self.assertContains(response, "Activate", count=1, status_code=200)       
+        self.assertContains(response, "Send Activation", count=1, status_code=200)       
 
         # delete the second email again
         path = reverse('emailmgr_email_delete', kwargs={'identifier': e[1].identifier})
@@ -229,7 +229,7 @@ class EmailDeleteTestCase(TestCase):
         self.assertContains(response, "example.com", count=1, status_code=200)
         self.assertContains(response, "Primary Email", count=1, status_code=200)
         self.assertNotContains(response, "Make Primary", status_code=200)
-        self.assertNotContains(response, "Activate", status_code=200)       
+        self.assertNotContains(response, "Send Activation", status_code=200)       
     
 
 class EmailActivateTestCase(TestCase):
@@ -260,14 +260,15 @@ class EmailActivateTestCase(TestCase):
         path = reverse('emailmgr_email_send_activation', kwargs={'identifier': e[1].identifier})
         response = self.client.get(path, follow=True)        
         self.assertContains(response, "example.com", count=3, status_code=200)
-        self.assertContains(response, "Activate", count=2, status_code=200)
+        self.assertContains(response, "Send Activation", count=1, status_code=200)
+        self.assertContains(response, "Resend Activation", count=1, status_code=200)
         self.assertContains(response, "activation email sent", count=1, status_code=200)
         
         # email is out, but pretent we have the email, so activate the second email
         path = reverse('emailmgr_email_activate', kwargs={'identifier': e[1].identifier})
         response = self.client.get(path, follow=True)        
         self.assertContains(response, "example.com", count=3, status_code=200)
-        self.assertContains(response, "Activate", count=1, status_code=200)
+        self.assertContains(response, "Send Activation", count=1, status_code=200)
         self.assertContains(response, "email address is now active", count=1, status_code=200)
 
         e = EmailAddress.objects.get(identifier__iexact=e[1].identifier)
@@ -301,7 +302,7 @@ class EmailMakePrimaryTestCase(TestCase):
         path = reverse('emailmgr_email_make_primary', kwargs={'identifier': e[0].identifier})
         response = self.client.get(path, follow=True)        
         self.assertContains(response, "example.com", count=3, status_code=200)
-        self.assertContains(response, "Activate", count=2, status_code=200)
+        self.assertContains(response, "Send Activation", count=2, status_code=200)
         self.assertContains(response, "Primary Email", count=1, status_code=200)
         self.assertContains(response, "email address is already primary", count=1, status_code=200)
 
@@ -309,7 +310,7 @@ class EmailMakePrimaryTestCase(TestCase):
         path = reverse('emailmgr_email_make_primary', kwargs={'identifier': e[1].identifier})
         response = self.client.get(path, follow=True)        
         self.assertContains(response, "example.com", count=3, status_code=200)
-        self.assertContains(response, "Activate", count=2, status_code=200)
+        self.assertContains(response, "Send Activation", count=2, status_code=200)
         self.assertContains(response, "Primary Email", count=1, status_code=200)
         self.assertNotContains(response, "Make Primary", status_code=200)
         self.assertContains(response, "email address must be activated first", count=1, status_code=200)
@@ -318,14 +319,16 @@ class EmailMakePrimaryTestCase(TestCase):
         path = reverse('emailmgr_email_send_activation', kwargs={'identifier': e[1].identifier})
         response = self.client.get(path, follow=True)        
         self.assertContains(response, "example.com", count=3, status_code=200)
-        self.assertContains(response, "Activate", count=2, status_code=200)
+        self.assertContains(response, "Send Activation", count=1, status_code=200)
+        self.assertContains(response, "Resend Activation", count=1, status_code=200)
         self.assertContains(response, "activation email sent", count=1, status_code=200)
         
         # email is out, but pretent we have the email, so activate the second email
         path = reverse('emailmgr_email_activate', kwargs={'identifier': e[1].identifier})
         response = self.client.get(path, follow=True)        
         self.assertContains(response, "example.com", count=3, status_code=200)
-        self.assertContains(response, "Activate", count=1, status_code=200)
+        self.assertContains(response, "Send Activation", count=1, status_code=200)
+        self.assertNotContains(response, "Resend Activation", status_code=200)
         self.assertContains(response, "email address is now active", count=1, status_code=200)
 
         email = EmailAddress.objects.get(identifier__iexact=e[1].identifier)
@@ -335,7 +338,7 @@ class EmailMakePrimaryTestCase(TestCase):
         path = reverse('emailmgr_email_make_primary', kwargs={'identifier': e[1].identifier})
         response = self.client.get(path, follow=True)        
         self.assertContains(response, "example.com", count=3, status_code=200)
-        self.assertContains(response, "Activate", count=1, status_code=200)
+        self.assertContains(response, "Send Activation", count=1, status_code=200)
         self.assertContains(response, "Primary Email", count=1, status_code=200)
         self.assertContains(response, "Make Primary", count=1, status_code=200)
         self.assertContains(response, "primary address changed", count=1, status_code=200)

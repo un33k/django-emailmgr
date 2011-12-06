@@ -10,6 +10,7 @@ class EmailAddress(models.Model):
     email = models.EmailField(_("Email Address"))
     is_primary = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    is_activation_sent = models.BooleanField(default=False)
     identifier = models.CharField(max_length=255, null=True)
 
     class Meta:
