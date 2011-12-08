@@ -1,7 +1,7 @@
 django-emailmgr
 ================
 
-Django emailmgr is an application that helps with post registration email management".
+Django Email Manager (emailmgr) is an application that helps with post-registration email management".
 ``You can associate multiple email addresses to a single Django User.``
 
 This application comes into the picture only after a user has been created, activated
@@ -18,8 +18,7 @@ Current Features:
 _________________
 Assumption:
     * - Django user has been created 
-    * - Either via proper registration and activation or via the admin interface or scripts
-    * - User has a valid email address
+        * - Either via proper registration and activation or via the admin interface or scripts
     * - This application first looks for its templates in: EMAIL_MGR_TEMPLATE_PATH, then
         it looks for <template_dir>/emailmgr/
         * - This way, projects can place the required templates at a location of their choice
@@ -31,49 +30,55 @@ Assumption:
             * - extra context: current_site, activate_url & user
         * - email list & manipulation template - emailmgr_email_list.html
             * - extra context: emails_list and add_email_form
-                * - email_list includes all emails for this users (primary email first)
-                * - add_email_form is a form for adding a new email address to user
+                * - email_list includes all emails for this users
+                    * - sorted by: 
+                        1. primary - set directly via django or by emailmgr
+                        2. activated - confirmed emails and can be set primary
+                        3. not activated but activation email sent
+                        5. not activated and activation email not sent
+                * - add_email_form is a form for adding a new email address to a user
 
-1. Latch on the ``post_save`` signals for (user) and execute the following:
-    A. Create an email address object with the following attributes
-        * - email = user.email
+1. This app latches on the ``post_save`` signals for (user) and execute the following:
+    A. Creates an email address object with the following attributes
+        * - email = user.email (if not blank)
         * - is_active = True
         * - is_primary = True
+        * - is_activation_sent = Don't care
         * - identifier = a random string (used for activation)
         * - Note: user login is not required
         * - Note: email is only created if user has a valid email address
         * - Note: this email is automatically considered as primary and activation is skipped
 
 2. Latch on the ``post_delete`` signals on (user) and execute the following:
-    A. Delete all email addressed associated with the deleted user
+    A. Deletes all email addresses associated with the (just) deleted user
     
-3. Provide URL to:
-    A. Add an email address to the logged user's account:
+3. Provides URL to:
+    A. Adds an email address to the logged in user's account:
         * - http://example.com/email/add/, 
         * - Email address is created and associated with the logged in user
         * - Email address remains inactive and cannot be made primary
         * - User is redirected to http://example.com/email/list/
-        * - ``emails_list`` and ``add_email_form`` are passed into the template
+        * - ``email_list`` and ``email_form`` are passed into the template
         
-    B. Delete an email address from a user account
+    B. Deletes an email address from a user account
         * - http://example.com/email/delete/<identifier>/, 
         * - Existing email address with the above identifier is deleted
         * - Primary email address cannot be delete
         * - Once the email is deleted, user is redirected to http://example.com/email/list/
         
-    C. Send activation link for a newly added email address to user's primary email address
+    C. Sends activation link for a newly added email address (sendto = user's primary email address)
         * - http://example.com/email/send_activation/<identifier>/, 
         * - An activation email is sent to the logged in user's primary address
         * - Note: all emails remain inactive unless activated
         * - Once the email is sent, user is redirected to http://example.com/email/list/
 
-    D. Activate an email address when user clicks on an activation link
+    D. Activates an email address when user clicks on an activation link
         * - http://example.com/email/activate/<identifier>/,
         * - Note: link was emailed to user's primary email address
         * - Matched email will be activated (then eligible to be promoted to primary)
         * - Once the email is activated, user is redirected to http://example.com/email/list/
 
-    E. Make an activated email address the primary email
+    E. Makes an activated email address the primary email
         * - http://example.com/email/make_primary/<identifier>/,
         * - Only activated email addresses can be promoted to be the primary email address
         * - User.email is set to the newly promoted primary email address
@@ -101,6 +106,8 @@ A. Install django-emailmgr:
 
     * _ Stick ``"emailmgr"`` in ``INSTALLED_APPS``, right after all other Django specific Apps
     * _ Follow the instruction in the ``Current Features`` at the top of this file for usage.
+    * _ Use the templates in test directory as an example to create your own templates
+    * _ Include this application's urls or create your own urls for this application
     * _ Run syncdb and enjoy
 
 ToDo

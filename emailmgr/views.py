@@ -77,7 +77,7 @@ def email_send_activation(request, identifier="somekey"):
     if email.is_active:
         Msg.add_message (request, Msg.SUCCESS, _('email address already activated'))
     else:
-        send_activation(request, identifier)
+        send_activation(email, request.is_secure())
         email.is_activation_sent = True
         email.save()
         user_sent_activation.send(sender=EmailAddress, email_address=email)

@@ -27,30 +27,30 @@ def get_template(name):
 
 
 # send activation link to user's primary email address
-def send_activation(request, identifier):
+def send_activation(email, is_secure):
     # import pdb; pdb.set_trace()
     this_site = Site.objects.get_current()
     
     # first try to use our views fuction to construct the activation path (deterministic)
     # if views didn't reverse to a path, then use named url (less deterministic as it is user configurable)
     try:
-        p = reverse("emailargs.view.email_activate",args=[identifier])
+        p = reverse("emailargs.view.email_activate",args=[email.identifier])
     except NoReverseMatch:
-        p = reverse('emailmgr_email_activate', kwargs={'identifier': identifier})
+        p = reverse('emailmgr_email_activate', kwargs={'identifier': email.identifier})
             
     proto = getattr(settings, "DEFAULT_HTTP_PROTOCOL", "")
     if not proto:
-        if request.is_secure():
+        if is_secure:
             proto = "https"
         else:
             proto = "http"
 
-    url = u"%s://%s%s" % (proto, unicode(this_site.domain),p)
-    context = {"user": request.user, "activate_url": url, "this_site": this_site,"identifier": identifier,}
-    subject = render_to_string(get_template("emailmgr_activation_subject.txt"), context)
-    subject = "".join(subject.splitlines())
+    url = u"%s://%s%s" % (proto, unicode(this_site.domain), p)
+    context = {"user": email.user, "activate_url": url, "this_site": this_site,"identifier": email.identifier,}
+    subject = "".join(render_to_string(get_template("emailmgr_activation_subject.txt"), context).splitlines())
     message = render_to_string(get_template("emailmgr_activation_message.txt"), context)
-    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [request.user.email])
+    sendto = [e for e in (email.user.email, email.email) if e]
+    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, sendto)
 
 def sort_email():
     return ['-is_primary', '-is_active', '-is_activation_sent']
