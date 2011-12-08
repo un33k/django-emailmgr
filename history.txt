@@ -1,5 +1,9 @@
 This file lists all changes and fixes that have been made for django-emailmgr.
 
+* 8 Dec 2011 (0.7-0.8)
+1. ensure you send activation email to just added email as well as primary email if exist
+2. ensure first email added is automatically promoted primary
+
 * 5 Dec 2011 (0.6)
 1. Add south support
 2. Sort emails

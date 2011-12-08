@@ -102,10 +102,14 @@ def email_activate(request, identifier="somekey"):
             Msg.add_message (request, Msg.SUCCESS, _('email address already active'))
         else:
             email.is_active = True
+            if not email.user.email:
+                email.user.email = email.email
+                email.is_primary = True
+                email.user.save()
             email.save()
             user_activated_email.send(sender=EmailAddress, email_address=email)
             Msg.add_message (request, Msg.SUCCESS, _('email address is now active'))
-
+            
     return HttpResponseRedirect(reverse('emailmgr_email_list'))
 
 @login_required
