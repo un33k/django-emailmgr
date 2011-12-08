@@ -49,8 +49,7 @@ def send_activation(email, is_secure):
     context = {"user": email.user, "activate_url": url, "this_site": this_site,"identifier": email.identifier,}
     subject = "".join(render_to_string(get_template("emailmgr_activation_subject.txt"), context).splitlines())
     message = render_to_string(get_template("emailmgr_activation_message.txt"), context)
-    sendto = [e for e in (email.user.email, email.email) if e]
-    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, sendto)
+    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email.email])
 
 def sort_email():
     return ['-is_primary', '-is_active', '-is_activation_sent']
