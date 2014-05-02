@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls.defaults import patterns, include, url
+from django.conf.urls import patterns, include, url
 from django.conf import settings
 from views import email_add, email_list, email_delete, \
             email_send_activation, email_activate, email_make_primary
